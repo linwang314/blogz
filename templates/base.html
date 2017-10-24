@@ -7,8 +7,24 @@
         <title>{{title}}</title>
     </head>
     <body>
+        <a href="/">Home</a>
+        &emsp;
         <a href="/blog">Main Blog Page</a>
+        &emsp;
+        <a href="/login">Login</a>
+        &emsp;
         <a href="/newpost">Add a Blog Entry</a>
+        &emsp;
+        <a href="/logout">Logout</a>
+        
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            <ul>
+                {% for category,message in messages %}
+                    <li class="{{category}}">{{message}}</li>
+                {% endfor %}
+            </ul>
+        {% endwith %}
+
         {% block content %}
         {% endblock %}
     </body>
