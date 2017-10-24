@@ -68,15 +68,15 @@ def signup():
         existing_user = User.query.filter_by(username=username).first()
         
         if (username is None) or (password is None) or (verify is None):
-            flash('One or more invalid fields')
+            flash('One or more invalid fields', 'error')
         elif existing_user:
-            flash('Username already exists')
+            flash('Username already exists', 'error')
         elif len(username) < 3 or len(username) > 20:
-            flash('Invalid username')
+            flash('Invalid username', 'error')
         elif len(password) < 3 or len(password) > 20:
-            flash('Invalid password')
+            flash('Invalid password', 'error')
         elif password != verify:
-            flash("Passwords don't match")
+            flash("Passwords don't match", 'error')
         else:
             new_user = User(username, password)
             db.session.add(new_user)
@@ -118,9 +118,9 @@ def newpost():
         blog_body = request.form['body']
         
         if blog_title == '':
-            flash('No blog title')
+            flash('No blog title', 'error')
         if blog_body == '':
-            flash('Not blog content')
+            flash('Not blog content', 'error')
 
         if blog_title and blog_body:
             new_blog = Blog(blog_title, blog_body, blog_owner)
@@ -128,10 +128,7 @@ def newpost():
             db.session.commit()
             new_blog_id = Blog.query.order_by("id desc").first().id
             return redirect("/blog?id={0}".format(new_blog_id))
-        else:
-            return render_template('newpost.html', title="Add a Blog Entry",
-                title_error=title_error, body_error=body_error)
-
+        
     return render_template('newpost.html', title="Add a Blog Entry")
 
 if __name__ == '__main__':
