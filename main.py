@@ -31,6 +31,17 @@ class User(db.Model):
         self.username = username
         self.password = password
 
+@app.before_request
+def require_login():
+    allowed_routes = ['login', 'signup', 'blog', 'index']
+    if request.endpoint not in allowed_routes and 'username' not in session:
+        return redirect('/login')
+
+@app.route("/")
+def index():
+    users = User.query.all()
+    return render_template('/index.html', users=users)
+
 @app.route("/login", methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
@@ -83,10 +94,16 @@ def logout():
 @app.route("/blog")
 def blog():
     blog_id = request.args.get('id')
+    blog_user = request.args.get('user')
+        
     if blog_id is not None:
-        blog_title = Blog.query.get(blog_id).title
-        blog_body = Blog.query.get(blog_id).body
-        return render_template('page.html', blog_title=blog_title, blog_body=blog_body)
+        blog = Blog.query.get(blog_id)
+        return render_template('page.html', blog=blog)
+    if blog_user is not None:
+        user_id = User.query.filter_by(username=blog_user).first().id
+        blogs = Blog.query.filter_by(owner_id=user_id).all()
+        return render_template('posts.html', blogs=blogs)
+
     else:
         blogs = Blog.query.all()
         return render_template('blog.html', title="Build a Blog", blogs=blogs)
